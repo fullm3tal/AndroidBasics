@@ -7,8 +7,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_task_list.*
 
+@AndroidEntryPoint
 class TaskListFragment : Fragment() {
 
     private val viewModel: TaskListViewModel by activityViewModels()
