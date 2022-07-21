@@ -1,14 +1,17 @@
 package com.example.androidbasics
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class TaskDetailRepository {
+class TaskDetailRepository @Inject constructor() : ITaskDetailRepository {
 
-    suspend fun getUsersData(): Result<UserRespnse> {
-        return try {
-            val response = CallbackHandler.processNetworkCall(ClientProvider.create().getUsers())
-            Result.Success(response)
+    override fun fetchUsersData(): Flow<Result<UserResponse>> = flow {
+        try {
+            val response = ClientProvider.create().getUsers()
+            emit(Result.Success(response))
         } catch (e: Exception) {
-            Result.Failure(e)
+            emit(Result.Failure(e))
         }
     }
 

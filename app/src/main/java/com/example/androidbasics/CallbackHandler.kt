@@ -1,6 +1,5 @@
 package com.example.androidbasics
 
-import android.content.Context
 import kotlinx.coroutines.suspendCancellableCoroutine
 import retrofit2.Call
 import retrofit2.Callback

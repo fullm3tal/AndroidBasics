@@ -1,23 +1,14 @@
 package com.example.androidbasics
 
-import android.app.Application
-import android.content.Context
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
-class TaskDetailViewModel @Inject constructor() : ViewModel() {
-
-    val repo = TaskDetailRepository()
-
+class TaskDetailViewModel @Inject constructor(private val repository: ITaskDetailRepository) : ViewModel() {
     val name = "Kishan"
 
     private var mutableStateFlow: MutableStateFlow<TaskDetailUIState> = MutableStateFlow(
@@ -34,15 +25,17 @@ class TaskDetailViewModel @Inject constructor() : ViewModel() {
 
     fun fetchStatus() {
         viewModelScope.launch {
-            when (repo.getUsersData()) {
-                is Result.Failure -> {
-                    update(Tesla.FAILURE)
-                }
-                Result.Loading -> {
-                    update(Tesla.PARENT)
-                }
-                is Result.Success -> {
-                    update(Tesla.SUCCESS)
+            repository.fetchUsersData().collect {
+                when (it) {
+                    is Result.Failure -> {
+                        update(Tesla.FAILURE)
+                    }
+                    Result.Loading -> {
+                        update(Tesla.PARENT)
+                    }
+                    is Result.Success -> {
+                        update(Tesla.SUCCESS)
+                    }
                 }
             }
         }
