@@ -1,15 +1,21 @@
 package com.example.androidbasics
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.random.Random
 
 @HiltViewModel
 class TaskDetailViewModel @Inject constructor(private val repository: ITaskDetailRepository) : ViewModel() {
     val name = "Kishan"
+
+    var job: Job? = null
+    var number = 0
 
     private var mutableStateFlow: MutableStateFlow<TaskDetailUIState> = MutableStateFlow(
         TaskDetailUIState(
@@ -22,13 +28,17 @@ class TaskDetailViewModel @Inject constructor(private val repository: ITaskDetai
     )
     val stateFlow: StateFlow<TaskDetailUIState> = mutableStateFlow
 
-
     fun fetchStatus() {
-        viewModelScope.launch {
+        if(job?.isActive == true) {
+            Log.v("TAG", "Cancelling job +${job}")
+            job?.cancel()
+        }
+      job = viewModelScope.launch {
             repository.fetchUsersData().collect {
                 when (it) {
                     is Result.Failure -> {
-                        update(Tesla.FAILURE)
+                        number++
+                        updateNumber(number)
                     }
                     Result.Loading -> {
                         update(Tesla.PARENT)
@@ -39,6 +49,7 @@ class TaskDetailViewModel @Inject constructor(private val repository: ITaskDetai
                 }
             }
         }
+        Log.v("TAG", "New job +${job}")
     }
 
     fun setOwnerName() {
@@ -56,6 +67,12 @@ class TaskDetailViewModel @Inject constructor(private val repository: ITaskDetai
     val flow = flowOf(Tesla.SUCCESS, Tesla.FAILURE, Tesla.DECOMPOSE, Tesla.PARENT)
 
     fun update(value: Tesla) {
+        mutableStateFlow.update {
+            it.copy(taskOwner = value.toString())
+        }
+    }
+
+    fun updateNumber(value: Int) {
         mutableStateFlow.update {
             it.copy(taskOwner = value.toString())
         }

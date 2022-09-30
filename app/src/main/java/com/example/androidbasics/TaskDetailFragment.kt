@@ -46,7 +46,7 @@ class TaskDetailFragment : Fragment() {
 
     private fun setOnClickListeners() {
         binding.fab1.setOnClickListener {
-            detailViewModel.setOwnerName()
+            detailViewModel.fetchStatus()
         }
         binding.fab2.setOnClickListener {
             detailViewModel.fetchStatus()
